@@ -34,26 +34,27 @@ def parse_html(html_page):
 
     list_cars = []
     
-    for x in list_object.find_all('a', {'class' : 'b-advItem'}):
+    for x in list_object.find_all('div', {'data-ftid' : 'bulls-list_bull'}):
         list_cars.append(x)
-        
     var = []
     
     for x in list_cars:
-        var.append({"URL" : x['href'],
-                    "date" : x.find_all('div', {'class' : 'b-advItem__param'})[-1]
+        var.append({
+                    "URL" : x.find('a', {'data-ftid': 'bull_title'}).get('href'),
+                    "date" : x.find_all('div', {'data-ftid' : 'bull_date'})[0]
                               .text
                               .replace("\xa0", " "),
-                    "year" : x.find_all("div", {'class' : 'b-advItem__title'})[0]
+                    "year" : x.find_all("a", {'data-ftid' : 'bull_title'})[0]
                               .text
                               .split(", ")[1],
-                    "price" : x.find_all('div', {'class' : 'b-advItem__price '})[0]
+                    "price" : x.find_all('span', {'data-ftid' : 'bull_price'})[0]
                                .text
                                .replace("\n", "")
                                .replace("\xa0", "")
+                               .replace("&nbsp;", "")
                                .strip()
                                .replace("q", ""),
-                    "city" : x.find_all('div', {'class' : 'b-advItem__param'})[-2]
+                    "city" : x.find_all('span', {'data-ftid' : 'bull_location'})[0]
                               .text
             })
         
@@ -100,7 +101,7 @@ def count_page(current_link):
         
         content_page = BeautifulSoup(content, 'html.parser')
         #print(content_page)
-        var = content_page.find("a", {"class" : "b-pagination__item_next"})
+        var = content_page.find("a", {"data-ftid" : "component_pagination-item-next"})
         if var is None:
             print(("Pages: {0}".format(count)))
             x = parse_html(content)
